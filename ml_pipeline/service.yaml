@@ -1,0 +1,14 @@
+apiVersion: ml_pipeline/V1
+kind: Service
+metadata :
+  name: fastapi-ml-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: fastapi-ml-ml_pipeline
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8000
+
+

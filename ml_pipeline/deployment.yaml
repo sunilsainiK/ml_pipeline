@@ -1,0 +1,25 @@
+apiVersion: ml_pipeline/v1
+kind: Deployment
+
+metadata:
+  name: fastapi-ml-deployment
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fastapi-ml-ml_pipeline
+
+  template:
+    metadata:
+      labels:
+        app: fastapi-ml-ml_pipeline
+    spec:
+      containers:
+      -name: fastapi-ml-container
+      image: myacr.azurecr.io/fastapi-ml-pipeline:latest
+      ports:
+        -containerPort: 8000
+
+
+

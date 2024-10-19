@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  preprocessing:
+    build:
+      context: .
+      dockerfile: Dockerfile.preprocess
+    volumes:
+      - ./data:/app/data  # Mount a volume to share data
+
+  training:
+    build:
+      context: .
+      dockerfile: Dockerfile.train
+    volumes:
+      - ./data:/app/data
+    depends_on:
+      - preprocessing  # Ensuring preprocessing completes before training
+
+  prediction:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"  # Expose port for FastAPI app
+    depends_on:
+      - training  # Ensuring training completes before predictions
+
+  monitoring:
+    image: python:3.12-slim  # Use a lightweight Python image for monitoring
+    volumes:
+      - ./data:/app/data
+    command: ["python", "ml_pipeline/monitoring.py"]  # Run the monitoring script
