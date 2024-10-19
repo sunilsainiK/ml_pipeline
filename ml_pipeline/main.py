@@ -1,147 +1,138 @@
+# File: ml_pipeline/main.py
 import os
-import pickle
 import logging
-from fastapi import FastAPI, HTTPException
-from ml_pipeline.core.training import train_model
-from ml_pipeline.utils.load_model import load_model
-from ml_pipeline.utils.save_model import save_model
+from fastapi import FastAPI
 from contextlib import asynccontextmanager
-from pydantic import BaseModel
-import xgboost as xgb
-import pandas as pd
-from ml_pipeline.core.preprocessing import load_and_preprocess  # Import the function from preprocessing.py
+from ml_pipeline.api.prediction import router as prediction_router
+from ml_pipeline.api.training import router as training_router
+from ml_pipeline.core.preprocessing import load_and_preprocess
+from ml_pipeline.utils.data_drift import detect_data_drift
+from ml_pipeline.core.training import train_model
 
 # Set up logging
-logging.basicConfig(level=logging.INFO)  # You can adjust the logging level here
+LOG_DIR = './ml_pipeline/logs/'
+if not os.path.exists(LOG_DIR):
+    os.makedirs(LOG_DIR)
+
+logging.basicConfig(level=logging.INFO, filename=os.path.join(LOG_DIR, 'app.log'),
+                    filemode='a', format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-# Define the FastAPI app
+# Paths
+DATA_PATH = os.getenv("DATA_PATH", "ml_pipeline/Data/datatraining.txt")
+PREPROCESSED_DATA_PATH = "./ml_pipeline/models/preprocessed_data.pkl"
+MODEL_PATH = "./ml_pipeline/models/xgboost_model.pkl"
+
+# Initialize FastAPI app
 app = FastAPI()
 
-# Define the paths for data and model files
-DATA_PATH = "ml_pipeline/Data/datatraining.txt"
-MODEL_PATH = "./ml_pipeline/models/xgboost_model.pkl"
-PREPROCESSED_DATA_PATH = "./ml_pipeline/models/preprocessed_data.pkl"  # Path for saving the preprocessed data
-PROCESSED_DATA_PATH = "./ml_pipeline/models/processed_data.pkl"  # Path for saving the split data
+# Include the prediction and training routes
+app.include_router(prediction_router)
+app.include_router(training_router)
 
-class PredictionInput(BaseModel):
-    Temperature: float
-    Humidity: float
-    Light: float
-    CO2: float
-    HumidityRatio: float
-    hour: int
-    day_of_week: int
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """
-    FastAPI lifespan handler to manage startup and shutdown logic.
-    Preprocesses and saves data before splitting, then splits the data afterward.
+    Lifespan handler to manage preprocessing, training, and monitoring.
     """
-    logger.info("Starting the FastAPI application...")
+    logger.info("Starting FastAPI application...")
 
-    # Step 1: Check if the data file exists
-    if not os.path.exists(DATA_PATH):
-        logger.error(f"Data file not found at {DATA_PATH}. Please ensure the data file is available.")
-        yield
-        return
+    if is_preprocessed_data_outdated(DATA_PATH, PREPROCESSED_DATA_PATH):
+        logger.info("Preprocessed data is outdated or missing. Preprocessing...")
+        await preprocess_and_save_data()
 
-    # Step 2: Check if the model file exists
-    if not os.path.exists(MODEL_PATH):
-        logger.info(f"Model file not found at {MODEL_PATH}. Training the model...")
-
-        # Preprocess the data if it hasn't been done already
-        if not os.path.exists(PREPROCESSED_DATA_PATH):
-            logger.info(f"Preprocessing the data from {DATA_PATH}...")
-
-            # Preprocess without splitting
-            X, y = load_and_preprocess(DATA_PATH, return_split=False)
-
-            # Save the preprocessed data before splitting
-            with open(PREPROCESSED_DATA_PATH, "wb") as f:
-                pickle.dump((X, y), f)
-            logger.info(f"Preprocessed data saved at {PREPROCESSED_DATA_PATH}.")
-        else:
-            logger.info(f"Preprocessed data already exists at {PREPROCESSED_DATA_PATH}.")
-
-        # Now split the data into train and test sets
-        if not os.path.exists(PROCESSED_DATA_PATH):
-            logger.info("Splitting the data into train and test sets...")
-
-            # Load preprocessed data
-            with open(PREPROCESSED_DATA_PATH, "rb") as f:
-                X, y = pickle.load(f)
-
-            # Split the data
-            X_train, X_test, y_train, y_test = load_and_preprocess(DATA_PATH, return_split=True)
-
-            # Save the split data
-            save_model([X_train, X_test, y_train, y_test], PROCESSED_DATA_PATH)
-            logger.info(f"Processed train/test data saved at {PROCESSED_DATA_PATH}.")
-
-        # Train the model
-        message = train_model(DATA_PATH)  # Train your model on the split data
-        logger.info(message['message'])  # Log the training result message
-
+        logger.info("Training the model with updated data...")
+        await start_training_process()
     else:
-        logger.info(f"Model file found at {MODEL_PATH}. Loading the model...")
-        # Attempt to load the model to ensure it's valid
-        try:
-            model = load_model(MODEL_PATH)
-            logger.info("Model loaded successfully.")
-        except Exception as e:
-            logger.error(f"Failed to load model: {str(e)}. Re-training the model...")
-            message = train_model(DATA_PATH)
-            logger.info(message['message'])
+        logger.info("Preprocessed data is up-to-date. Checking for new data.")
+        if check_for_new_data(DATA_PATH, PREPROCESSED_DATA_PATH):
+            logger.info("New data detected. Reprocessing and retraining the model...")
+            await preprocess_and_save_data()
+            await start_training_process()
 
     yield
 
 
-# Attach the lifespan handler to the FastAPI app
-app = FastAPI(lifespan=lifespan)
+@app.on_event("startup")
+async def startup_event():
+    """
+    Startup event to initialize preprocessing and training.
+    """
+    async with lifespan(app):
+        pass
 
 
 @app.get("/")
-def read_root():
-    return {"message": "ML Data Pipeline with FastAPI - Initial setup complete"}
+async def root():
+    return {"message": "Welcome to the ML Pipeline API!"}
 
 
-@app.post("/predict")
-def predict(input_data: PredictionInput):
+def is_preprocessed_data_outdated(data_path, preprocessed_data_path):
     """
-    Endpoint to run a prediction using the trained model.
-    It accepts input data and returns the prediction result.
+    Check if preprocessed data is outdated by comparing the modification times.
     """
-    global model
-
-    if model is None:
-        raise HTTPException(status_code=400, detail="Model is not loaded or trained.")
-
-    # Prepare the input for the model
-    input_df = pd.DataFrame([input_data.dict()])  # Convert input data to DataFrame for XGBoost
-
-    # Run prediction
     try:
-        prediction = model.predict(xgb.DMatrix(input_df))
-        predicted_label = int(prediction[0])  # Assuming binary classification
-        return {"prediction": predicted_label}
+        if not os.path.exists(preprocessed_data_path):
+            logger.warning("No preprocessed data found.")
+            return True
+
+        data_mod_time = os.path.getmtime(data_path)
+        preprocessed_mod_time = os.path.getmtime(preprocessed_data_path)
+
+        if data_mod_time > preprocessed_mod_time:
+            logger.info("Preprocessed data is outdated.")
+            return True
+        return False
     except Exception as e:
-        logger.error(f"Error in prediction: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Error in prediction: {str(e)}")
+        logger.error(f"Error checking data files: {e}")
+        return True
 
 
-@app.get("/status")
-def get_status():
+async def preprocess_and_save_data():
     """
-    Check the status of the data and model files.
+    Preprocess the raw data and save the preprocessed data.
     """
-    data_exists = os.path.exists(DATA_PATH)
-    model_exists = os.path.exists(MODEL_PATH)
+    try:
+        X_train, X_test, y_train, y_test = load_and_preprocess(DATA_PATH)
+        with open(PREPROCESSED_DATA_PATH, 'wb') as f:
+            import pickle
+            pickle.dump((X_train, X_test, y_train, y_test), f)
+        logger.info("Preprocessed data saved successfully.")
+    except Exception as e:
+        logger.error(f"Error during preprocessing: {e}")
+        raise
 
-    return {
-        "data_exists": data_exists,
-        "model_exists": model_exists,
-        "message": "System ready" if data_exists and model_exists else "System not fully set up"
-    }
 
+async def start_training_process():
+    """
+    Start the model training process.
+    """
+    try:
+        logger.info("Starting training process...")
+        train_result = train_model(DATA_PATH)
+        logger.info(train_result['message'])
+    except Exception as e:
+        logger.error(f"Error during training: {e}")
+        raise
+
+
+def check_for_new_data(data_path, preprocessed_data_path):
+    """
+    Check if new data has arrived by comparing modification times.
+    """
+    try:
+        if not os.path.exists(preprocessed_data_path):
+            logger.warning("Preprocessed data not found. New data is available.")
+            return True
+
+        data_mod_time = os.path.getmtime(data_path)
+        preprocessed_mod_time = os.path.getmtime(preprocessed_data_path)
+
+        if data_mod_time > preprocessed_mod_time:
+            logger.info("New data has arrived for processing.")
+            return True
+        return False
+    except Exception as e:
+        logger.error(f"Error checking for new data: {e}")
+        return True
