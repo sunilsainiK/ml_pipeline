@@ -5,7 +5,7 @@ import json
 
 
 def calculate_baseline_metrics(X: pd.DataFrame, baseline_path: str):
-    """Calculate and save baseline metrics for each feature."""
+    """Calculating and save baseline metrics for each feature."""
     baseline_metrics = {
         "means": X.mean().to_dict(),
         "stds": X.std().to_dict(),
@@ -34,7 +34,7 @@ def detect_data_drift(new_data: pd.DataFrame, baseline_metrics: dict) -> dict:
                 "drift_detected": p_value < 0.05  # Common threshold for significance
             }
         else:
-            # Handle categorical features (could also include additional logic here)
+            # Handling categorical features
             drift_results[column] = {
                 "drift_detected": not np.all(
                     new_data[column].value_counts(normalize=True) == baseline_metrics["means"].get(column, {})),

@@ -1,0 +1,21 @@
+
+# Useing Python 3.12 base image
+FROM python:3.12-slim
+
+# Setting the working directory inside the container
+WORKDIR /app
+
+# Copy all your project files into the container
+COPY . /app
+
+# Installing necessary dependencies
+RUN pip install --upgrade pip
+RUN pip install -r requirements.txt
+
+# Setting environment variables for paths used in the container
+ENV MODEL_PATH=/app/ml_pipeline/models/xgboost_model.pkl
+
+# Starting the FastAPI application for inference
+CMD ["uvicorn", "ml_pipeline.main:app", "--host", "0.0.0.0", "--port", "8000"]
+
+

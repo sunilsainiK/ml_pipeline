@@ -52,10 +52,10 @@ def monitor_data():
         else:
             # Check for data drift
             try:
-                X_train, _, _, _ = load_and_preprocess(os.path.join(DATA_DIRECTORY, "datatraining.txt"))
+                X_train, X_test, y_train, y_test = load_and_preprocess(os.path.join(DATA_DIRECTORY, "datatraining.txt"))
                 with open(PREPROCESSED_DATA_PATH, 'rb') as f:
                     import pickle
-                    X_train_old, _, _, _ = pickle.load(f)
+                    X_train_old, X_test_old, y_train_old, y_test_old = pickle.load(f)
 
                 drift_results = detect_data_drift(X_train, X_train_old)
                 if any(result["drift_detected"] for result in drift_results.values()):
