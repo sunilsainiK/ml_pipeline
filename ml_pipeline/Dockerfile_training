@@ -1,24 +1,22 @@
-# Using Python 3.10 base image
-FROM python:3.10-slim
+# Dockerfile_training
+
+# Use a base image with Python installed
+FROM python:3.10
 
 # Set the working directory inside the container
 WORKDIR /app
 
-# Copy the requirements.txt file to the container
-COPY --chown=root:root requirements.txt /app/requirements.txt
+# Copy the requirements file into the container
+COPY requirements.txt ./
 
 # Install necessary dependencies
-RUN pip install --upgrade pip && pip install -r /app/requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Ensure the Data directory exists inside the container
-RUN mkdir -p /app/ml_pipeline/Data
+# Copy the entire Data directory into the container
+COPY Data /app/Data
 
-# Copy the rest of the application code to the container
+# Copy the rest of your application code into the container
 COPY . /app
 
-# Set environment variables
-ENV MODEL_PATH=/app/models/xgboost_model.pkl
-ENV DATA_PATH=/app/ml_pipeline/Data/datatraining.txt
-
-# Command to run the training process
+# Command to run your training script
 CMD ["python", "-m", "monitoring"]
