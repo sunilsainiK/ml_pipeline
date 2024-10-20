@@ -5,15 +5,17 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a3446ed7-fafb-4f8b-a04f-e80221ce2cda" name="Changes" comment="Fixes bugs">
-      <change afterPath="$PROJECT_DIR$/ml_pipeline/models/preprocessed_data.pkl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/monitoring.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/run_first_time.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ml_pipeline/Data/datatraining.txt" beforeDir="false" afterPath="$PROJECT_DIR$/ml_pipeline/Data/datatraining.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ml_pipeline/Dockerfile_inference" beforeDir="false" afterPath="$PROJECT_DIR$/ml_pipeline/Dockerfile_inference" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ml_pipeline/Dockerfile_training" beforeDir="false" afterPath="$PROJECT_DIR$/ml_pipeline/Dockerfile_training" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ml_pipeline/api/prediction.py" beforeDir="false" afterPath="$PROJECT_DIR$/ml_pipeline/api/prediction.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ml_pipeline/core/preprocessing.py" beforeDir="false" afterPath="$PROJECT_DIR$/ml_pipeline/core/preprocessing.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ml_pipeline/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/ml_pipeline/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ml_pipeline/monitoring.py" beforeDir="false" afterPath="$PROJECT_DIR$/ml_pipeline/monitoring.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ml_pipeline/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/ml_pipeline/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ml_pipeline/core/training.py" beforeDir="false" afterPath="$PROJECT_DIR$/ml_pipeline/core/training.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ml_pipeline/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ml_pipeline/models/preprocessed_data.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ml_pipeline/monitoring.py" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -57,20 +59,22 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/Users/sunilsaini/PycharmProjects/Covestro/ml_pipeline/Data&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Python.main.executor": "Debug",
+    "Python.preprocessing.executor": "Debug",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "main",
+    "last_opened_file_path": "/Users/sunilsaini/PycharmProjects/Covestro/ml_pipeline/Data"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/ml_pipeline/Data" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/ml_pipeline" />
       <recent name="$PROJECT_DIR$" />
+      <recent name="$PROJECT_DIR$/ml_pipeline" />
       <recent name="$PROJECT_DIR$/app" />
     </key>
   </component>

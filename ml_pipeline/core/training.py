@@ -78,10 +78,10 @@ def train_model(data_file: str):
             logger.info("New model performs better. Saving the new model...")
             save_model(best_model, "ml_pipeline/models/xgboost_model.pkl")
             save_new_performance(new_roc_auc)
-            return {"message": "New model trained and saved successfully", "new_roc_auc": new_roc_auc}
+            return best_model, new_roc_auc  # Return the model and the ROC AUC score
         else:
             logger.info("New model does not perform better. Discarding the new model.")
-            return {"message": "New model did not outperform the current model", "new_roc_auc": new_roc_auc}
+            return None, new_roc_auc  # Return None for the model and the ROC AUC score
 
     except Exception as e:
         logger.error(f"Training failed: {e}")

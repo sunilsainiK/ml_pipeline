@@ -50,6 +50,10 @@ def preprocess_input(data: dict):
         features_array: A numpy array of the preprocessed features.
     """
     try:
+        # Ensure 'date' is provided
+        if 'date' not in data:
+            raise ValueError("Missing 'date' field in input data.")
+
         # Convert 'date' to datetime and extract hour and day of the week
         data['date'] = pd.to_datetime(data['date'])
         data['hour'] = data['date'].hour
@@ -64,8 +68,7 @@ def preprocess_input(data: dict):
         return features_array
 
     except Exception as e:
-        logger.error(f"Error during input preprocessing: {e}")
-        raise
+        raise ValueError(f"Error in preprocessing input data: {e}")
 
 
 def save_preprocessed_data(X_train, X_test, y_train, y_test, output_path):
