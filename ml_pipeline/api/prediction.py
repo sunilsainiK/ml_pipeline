@@ -1,7 +1,6 @@
-
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from ml_pipeline.utils.load_model import load_model
+from utils import load_model
 import pandas as pd
 import os
 

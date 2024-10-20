@@ -4,11 +4,11 @@ import os
 import logging
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
-from ml_pipeline.api.prediction import router as prediction_router
+from api.prediction import router as prediction_router
 
-from ml_pipeline.api.training import router as training_router
-from ml_pipeline.core.preprocessing import load_and_preprocess
-from ml_pipeline.core.training import train_model
+from api.training import router as training_router
+from core.preprocessing import load_and_preprocess
+from core.training import train_model
 
 # Setting up logging configuration to log all information into 'app.log' under the logs directory
 LOG_DIR = './ml_pipeline/logs/'

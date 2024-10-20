@@ -1,24 +1,19 @@
-version: '3'
+version: '3.8'  # Specify the version of Docker Compose
+
 services:
   training:
-    build:
-      context: .
-      dockerfile: Dockerfile_training
+    image: ml__pipeline_training_image  # Useing the pre-built training image
     volumes:
-      - ./ml_pipeline:/app/ml_pipeline  # Sharing model files and data
+      - ./data:/app/Data
     environment:
-      - MODEL_PATH=/app/ml_pipeline/models/xgboost_model.pkl
-      - DATA_PATH=/app/ml_pipeline/Data/datatraining.txt
-    restart: always  #  running to monitor for new data
+      - MODEL_PATH=/app/models/xgboost_model.pkl
+      - DATA_PATH=/app/Data/datatraining.txt
+    command: ["python", "-m", "monitoring"]  # Command to run training
 
   inference:
-    build:
-      context: .
-      dockerfile: Dockerfile_inference
-    volumes:
-      - ./ml_pipeline:/app/ml_pipeline  # Sharing model files
+    image: ml__pipeline_inference_image  # Useing the pre-built inference image
     ports:
-      - "8000:8000"  # Exposing FastAPI app on port 8000
+      - "8000:8000"  # Mapping the container port 8000 to host port 8000 for inference
     environment:
-      - MODEL_PATH=/app/ml_pipeline/models/xgboost_model.pkl
-    restart: always  # Keeping it running to serve predictions
+      - MODEL_PATH=/app/models/xgboost_model.pkl  # Same model path as training
+    command: ["uvicorn", "api.prediction:router", "--host", "0.0.0.0", "--port", "8000"]  # Command to run inference

@@ -3,8 +3,8 @@ import os
 import time
 import requests
 import logging
-from ml_pipeline.utils.data_drift import detect_data_drift
-from ml_pipeline.core.preprocessing import load_and_preprocess
+from utils.data_drift import detect_data_drift
+from core.preprocessing import load_and_preprocess
 
 # Logging setup
 logger = logging.getLogger(__name__)
