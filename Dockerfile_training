@@ -7,16 +7,16 @@ FROM python:3.10
 WORKDIR /app
 
 # Copy the requirements file into the container
-COPY requirements.txt ./
+COPY ml_pipeline/requirements.txt ./
 
 # Install necessary dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the entire Data directory into the container
-COPY Data /app/Data
+COPY ml_pipeline/Data /app/Data
 
 # Copy the rest of your application code into the container
-COPY . /app
+COPY ml_pipeline /app
 
 ENV MODEL_PATH=/app/models/xgboost_model.pkl
 # Command to run your training script

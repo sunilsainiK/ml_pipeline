@@ -5,7 +5,7 @@ FROM python:3.10
 WORKDIR /app
 
 # Copy the entire ml_pipeline directory into the container
-COPY . /app
+COPY ml_pipeline /app
 
 # Installing necessary dependencies
 RUN pip install --upgrade pip

@@ -1,8 +1,9 @@
 import os
 import logging
 import pickle
+import pandas as pd
 from pydantic import BaseModel
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 import numpy as np
 from fastapi import FastAPI, HTTPException, UploadFile, File
 from fastapi.responses import JSONResponse
@@ -11,14 +12,19 @@ from ml_pipeline.api.prediction import router as prediction_router
 from ml_pipeline.api.training import router as training_router
 from ml_pipeline.core.preprocessing import load_and_preprocess, preprocess_input
 from ml_pipeline.core.training import train_model
+from ml_pipeline.utils import load_model
 
-# Setting up logging configuration
-LOG_DIR = './logs/'
+LOG_DIR = 'ml_pipeline/logs/app.log'  # Change this to your desired path
+
 if not os.path.exists(LOG_DIR):
     os.makedirs(LOG_DIR)
 
-logging.basicConfig(level=logging.INFO, filename=os.path.join(LOG_DIR, 'app.log'),
-                    filemode='a', format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.DEBUG,  # Set to DEBUG for more detailed logs
+                    format='%(asctime)s - %(levelname)s - %(message)s',
+                    handlers=[
+                        logging.FileHandler(os.path.join(LOG_DIR, 'app.log')),
+                        logging.StreamHandler()  # Log to console as well
+                    ])
 logger = logging.getLogger(__name__)
 
 # Environment variables for model and data paths
@@ -26,22 +32,8 @@ DATA_PATH = "ml_pipeline/Data/datatraining.txt"
 PREPROCESSED_DATA_PATH = "ml_pipeline/models/preprocessed_data.pkl"
 MODEL_PATH = "ml_pipeline/models/xgboost_model.pkl"
 
-
-# Load the trained model (this assumes the model is already trained and saved)
-def load_model():
-    try:
-        with open(MODEL_PATH, 'rb') as f:
-            model = pickle.load(f)
-        logger.info("Model loaded successfully.")
-        return model
-    except Exception as e:
-        logger.error(f"Error loading model: {e}")
-        raise
-
-
-
 class PredictionInput(BaseModel):
-    date: str  # String format for the date
+    date: str
     Temperature: float
     Humidity: float
     Light: float
@@ -92,27 +84,33 @@ async def root():
 
 @app.post("/predict")
 async def predict(data: PredictionInput):
-    """
-    Endpoint to make predictions.
-    Expects a JSON object with features, including the 'date' for time-based features.
-    """
+
+
+    logger.info("Predict endpoint called with data: %s", data.dict())
     try:
-        # Convert the Pydantic model to a dictionary
+        # Convert input to dict and create DataFrame
         data_dict = data.dict()
+        df = pd.DataFrame([data_dict])
+        logger.info("Data after creating DataFrame: %s", df)
 
-        # Preprocess the input data using the updated preprocess function
-        features_array = preprocess_input(data_dict)
+        # Preprocess input
+        features_array = preprocess_input(df)
+        logger.info("Data after preprocessing: %s", features_array)
 
-        # Load the model
-        model = load_model()
+        # Load model
+        logger.info("Loading the trained model...")
+        model = load_model(MODEL_PATH)
 
-        # Make the prediction
+        # Make prediction
+        logger.info("Making predictions...")
         prediction = model.predict(features_array)
+        logger.info("Prediction result: %s", prediction)
 
-        return {"prediction": prediction.tolist()}
+        return {"prediction": int(prediction[0])}
     except Exception as e:
-        logger.error(f"Prediction error: {e}")
+        logger.error("Prediction error: %s", str(e))
         raise HTTPException(status_code=500, detail="Prediction failed")
+
 
 @app.post("/train")
 async def train(data: UploadFile = File(...)):
@@ -194,3 +192,4 @@ def check_for_new_data(data_path, preprocessed_data_path):
     except Exception as e:
         logger.error(f"Error checking for new data: {e}")
         return True
+

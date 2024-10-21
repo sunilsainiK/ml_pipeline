@@ -2,17 +2,18 @@
 
 import joblib
 import logging
+import pickle
+from fastapi import FastAPI, HTTPException, UploadFile, File
 
 logger = logging.getLogger(__name__)
 
-def load_model(file_path: str):
-    """
-    Load the trained model from the specified file path.
-    """
+def load_model(model_path):
+    logger.info(f"Loading model from {model_path}...")
     try:
-        model = joblib.load(file_path)
-        logger.info(f"Model loaded from {file_path}")
+        with open(model_path, 'rb') as model_file:
+            model = pickle.load(model_file)
+        logger.info("Model loaded successfully.")
         return model
     except Exception as e:
-        logger.error(f"Failed to load model: {e}")
-        raise RuntimeError(f"Failed to load model: {e}")
+        logger.error(f"Error loading model: {e}")
+        raise HTTPException(status_code=500, detail="Model loading failed")

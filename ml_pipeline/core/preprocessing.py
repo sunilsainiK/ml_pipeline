@@ -2,6 +2,7 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 import logging
 import os
+import numpy as np
 import pickle
 
 # Create a logger for this module
@@ -40,35 +41,14 @@ def load_and_preprocess(file_path: str, return_split=True):
         raise
 
 
-def preprocess_input(data: dict):
-    """
-    Preprocesses input data for a single prediction request.
+def preprocess_input(df):
+    # Extracting 'hour' and 'weekday' from the 'date' field
+    df['hour'] = pd.to_datetime(df['date']).dt.hour  # Extract hour from the date
+    df['weekday'] = pd.to_datetime(df['date']).dt.weekday  # Extract weekday from the date
 
-    - data: A dictionary containing the input data from the API.
-
-    Returns:
-        features_array: A numpy array of the preprocessed features.
-    """
-    try:
-        # Ensure 'date' is provided
-        if 'date' not in data:
-            raise ValueError("Missing 'date' field in input data.")
-
-        # Convert 'date' to datetime and extract hour and day of the week
-        data['date'] = pd.to_datetime(data['date'])
-        data['hour'] = data['date'].hour
-        data['day_of_week'] = data['date'].day_of_week
-
-        # Create a DataFrame and select the relevant features
-        df = pd.DataFrame([data])
-        features = df[['Temperature', 'Humidity', 'Light', 'CO2', 'HumidityRatio', 'hour', 'day_of_week']]
-
-        # Convert the DataFrame to a numpy array and reshape
-        features_array = features.values.reshape(1, -1)
-        return features_array
-
-    except Exception as e:
-        raise ValueError(f"Error in preprocessing input data: {e}")
+    features = df[['Temperature', 'Humidity', 'Light', 'CO2', 'HumidityRatio', 'hour', 'weekday']]
+    print(features.head())
+    return np.array(features)
 
 
 def save_preprocessed_data(X_train, X_test, y_train, y_test, output_path):
