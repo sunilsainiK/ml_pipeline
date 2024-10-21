@@ -2,18 +2,24 @@ version: '3.8'  # Specify the version of Docker Compose
 
 services:
   training:
-    image: ml__pipeline_training_image  # Useing the pre-built training image
+    build:
+      context: .  # Build from the current directory
+      dockerfile: Dockerfile_training  # Specify the Dockerfile for training
+    container_name: ml_training
     volumes:
-      - ./data:/app/Data
+      - ./data:/app/Data  # Mount local data directory to the container
     environment:
       - MODEL_PATH=/app/models/xgboost_model.pkl
       - DATA_PATH=/app/Data/datatraining.txt
     command: ["python", "-m", "monitoring"]  # Command to run training
 
   inference:
-    image: ml__pipeline_inference_image  # Useing the pre-built inference image
+    build:
+      context: .  # Build from the current directory
+      dockerfile: Dockerfile_inference  # Specify the Dockerfile for inference
+    container_name: ml_inference
     ports:
       - "8000:8000"  # Mapping the container port 8000 to host port 8000 for inference
     environment:
       - MODEL_PATH=/app/models/xgboost_model.pkl  # Same model path as training
-    command: ["uvicorn", "api.prediction:router", "--host", "0.0.0.0", "--port", "8000"]  # Command to run inference
+    command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

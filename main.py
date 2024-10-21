@@ -14,7 +14,7 @@ from ml_pipeline.core.preprocessing import load_and_preprocess, preprocess_input
 from ml_pipeline.core.training import train_model
 from ml_pipeline.utils import load_model
 
-LOG_DIR = 'ml_pipeline/logs/app.log'  # Change this to your desired path
+LOG_DIR = 'logs/'
 
 if not os.path.exists(LOG_DIR):
     os.makedirs(LOG_DIR)

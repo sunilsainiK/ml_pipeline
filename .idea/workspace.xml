@@ -4,18 +4,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a3446ed7-fafb-4f8b-a04f-e80221ce2cda" name="Changes" comment="Fixed bugs for docker and balance and checks for corrupted files">
-      <change afterPath="$PROJECT_DIR$/manual_predict.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/sample_input.json" afterDir="false" />
+    <list default="true" id="a3446ed7-fafb-4f8b-a04f-e80221ce2cda" name="Changes" comment="testing">
+      <change afterPath="$PROJECT_DIR$/tests/test_data_format.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dockerfile_inference" beforeDir="false" afterPath="$PROJECT_DIR$/Dockerfile_inference" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dockerfile_training" beforeDir="false" afterPath="$PROJECT_DIR$/Dockerfile_training" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ml_pipeline/Dockerfile_inference" beforeDir="false" afterPath="$PROJECT_DIR$/Dockerfile_inference" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ml_pipeline/Dockerfile_training" beforeDir="false" afterPath="$PROJECT_DIR$/Dockerfile_training" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ml_pipeline/api/prediction.py" beforeDir="false" afterPath="$PROJECT_DIR$/ml_pipeline/api/prediction.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ml_pipeline/api/training.py" beforeDir="false" afterPath="$PROJECT_DIR$/ml_pipeline/api/training.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ml_pipeline/core/preprocessing.py" beforeDir="false" afterPath="$PROJECT_DIR$/ml_pipeline/core/preprocessing.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ml_pipeline/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ml_pipeline/utils/load_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/ml_pipeline/utils/load_model.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ml_pipeline/.gitlab-ci.yml" beforeDir="false" afterPath="$PROJECT_DIR$/ml_pipeline/.gitlab-ci.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ml_pipeline/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/ml_pipeline/requirements.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -73,6 +70,7 @@
       <recent name="$PROJECT_DIR$/ml_pipeline/Data" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/tests" />
       <recent name="$PROJECT_DIR$" />
       <recent name="$PROJECT_DIR$/ml_pipeline" />
       <recent name="$PROJECT_DIR$/app" />
@@ -134,7 +132,15 @@
       <option name="project" value="LOCAL" />
       <updated>1729462322691</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="testing">
+      <option name="closed" value="true" />
+      <created>1729511269589</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1729511269589</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -165,6 +171,7 @@
     <MESSAGE value="updated packages" />
     <MESSAGE value="Fixes bugs" />
     <MESSAGE value="Fixed bugs for docker and balance and checks for corrupted files" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixed bugs for docker and balance and checks for corrupted files" />
+    <MESSAGE value="testing" />
+    <option name="LAST_COMMIT_MESSAGE" value="testing" />
   </component>
 </project>

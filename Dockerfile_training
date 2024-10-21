@@ -15,9 +15,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the entire Data directory into the container
 COPY ml_pipeline/Data /app/Data
 
-# Copy the rest of your application code into the container
-COPY ml_pipeline /app
+# Copy the rest of application code into the container
+COPY . .
+
 
 ENV MODEL_PATH=/app/models/xgboost_model.pkl
 # Command to run your training script
-CMD ["python", "-m", "monitoring"]
+CMD ["python", "monitoring.py"]
